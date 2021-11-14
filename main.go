@@ -26,8 +26,8 @@ func askInput(){
 }
 
 func findNonce(hash string) []byte{
-	difficulty := "0"
-	diffSlice := []byte(difficulty)
+
+	diffSlice := []byte{0}
 	fmt.Printf("The difficulty is: %x \n", diffSlice)
 	nonceFound := false
 	nonce:= -1
