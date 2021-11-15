@@ -26,6 +26,15 @@ func run(currMiner *Miner, wg *sync.WaitGroup,){
 	//Miner will need to know the difficulty, and the hash of the previousblock
 	//Structure will sort of be
 	//While there is no block coming in from the logger, findNonce, once nonce found, create and then send block
+	//The determinant for if the block is coming will need to be a channel pulling from the logger, for now I will just make it a boolean
+	noNewBlock:= true
+	//Diifuclty and previous hash will need to be pulled from the channel as well. Or its accessed from the blockchain?
+	for noNewBlock{
+		nonce,hash := findNonce("abc",1)
+		//create Block here
+		//Send block here
+	}
+
 	
 }
 
