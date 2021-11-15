@@ -2,13 +2,7 @@
 package main
 
 import (
-	"bytes"
 	"fmt"
-	//	"sync"
-	//	"time"
-	"crypto/sha256"
-	"strconv"
-
 )
 
 type Block struct {
@@ -20,7 +14,7 @@ type Block struct {
 func main() {
 	//var miners, diff,rounds int
 //	diff, miners, rounds := askInput()
-	nonce, hash := findNonce("abcd",1)
+	nonce, hash := findNonce("hteh",1)
 	fmt.Printf("%x %x \n", nonce, hash)
 
 }
@@ -48,24 +42,5 @@ func askInput() (int, int,int){
 }
 
 
-func findNonce(hash string, diff int) (int, [32]byte) {
 
-	diffSlice := make([]byte,diff)//Slice which is used to compare the found hash
-	nonceFound := false
-	nonce := -1
-
-	//This for loop continuely creates new hashes by concatenating a new nonce and the previous blocks hash each iteration.
-	//It then compares it to the difficulty
-	var newHash [32]byte
-	for !nonceFound {
-		nonce++
-		strNonce := strconv.Itoa(nonce)
-		newHash = sha256.Sum256([]byte(strNonce + hash))
-		x := newHash[:diff]
-		if bytes.Equal(x, diffSlice) {
-			nonceFound = true
-		}
-	}
-	return nonce, newHash
-}
 
