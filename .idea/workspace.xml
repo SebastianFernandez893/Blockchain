@@ -4,7 +4,7 @@
     <option name="autoReloadType" value="ALL" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b1c24d4c-5135-4513-a817-56fd18f44dc7" name="Changes" comment="">
+    <list default="true" id="b1c24d4c-5135-4513-a817-56fd18f44dc7" name="Changes" comment="So I didn't actually solve why the Hash wouldn't print out outside of the for loop, but I remembered we actually don't care about what the hash is, we only care about the nonce. The function now just returns the nonce which is an int">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/main.go" beforeDir="false" afterPath="$PROJECT_DIR$/main.go" afterDir="false" />
     </list>
@@ -87,5 +87,9 @@
       </map>
     </option>
     <option name="oldMeFiltersMigrated" value="true" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="So I didn't actually solve why the Hash wouldn't print out outside of the for loop, but I remembered we actually don't care about what the hash is, we only care about the nonce. The function now just returns the nonce which is an int" />
+    <option name="LAST_COMMIT_MESSAGE" value="So I didn't actually solve why the Hash wouldn't print out outside of the for loop, but I remembered we actually don't care about what the hash is, we only care about the nonce. The function now just returns the nonce which is an int" />
   </component>
 </project>

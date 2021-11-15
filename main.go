@@ -27,13 +27,14 @@ func askInput() {
 }
 
 func findNonce(hash string) int {
-
-	diffSlice := []byte{0}
+	//Will need a way to change the difficulty of diffSlice
+	diffSlice := []byte{0}  //Slice which is used to compare the found hash
 	fmt.Printf("The difficulty is: %x \n", diffSlice)
 	nonceFound := false
 	nonce := -1
 	var newHash []byte
-
+	//This for loop continuely creates new hashes by concatenating a new nonce and the previous blocks hash each iteration.
+	//It then compares it to the difficulty
 	for !nonceFound {
 		nonce++
 		strNonce := strconv.Itoa(nonce)
