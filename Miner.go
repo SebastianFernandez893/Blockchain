@@ -28,11 +28,16 @@ func run(currMiner *Miner, wg *sync.WaitGroup,){
 	//While there is no block coming in from the logger, findNonce, once nonce found, create and then send block
 	//The determinant for if the block is coming will need to be a channel pulling from the logger, for now I will just make it a boolean
 	noNewBlock:= true
-	//Diifuclty and previous hash will need to be pulled from the channel as well. Or its accessed from the blockchain?
+	//Diifuclty and previous hash will need to be pulled from the channel as well.
 	for noNewBlock{
 		nonce,hash := findNonce("abc",1)
+		var temp *Block //temporary block, dont know where to pull previous block pointer from
 		//create Block here
+
+		block :=createBlock(temp, nonce, hash)
+
 		//Send block here
+		currMiner.pushChan<-block
 	}
 
 	

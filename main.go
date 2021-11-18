@@ -8,9 +8,13 @@ import (
 type Block struct {
 	previousBlock *Block
 	nonce         int
-	tx            string //Do we need a tx at all? I guess it would then need to be its own struct, so maybe unessecary
+	//tx            string //Do we need a tx at all? I guess it would then need to be its own struct, so maybe unessecary
+	hash [32]byte
 }
-
+func createBlock(previousBlock *Block, nonce int,hash [32]byte) Block{
+	block := Block{previousBlock, nonce, hash}
+	return block
+}
 func main() {
 	//var miners, diff,rounds int
 //	diff, miners, rounds := askInput()
