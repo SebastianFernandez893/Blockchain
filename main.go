@@ -10,9 +10,15 @@ func main() {
 	fmt.Println("miners:", minerCount)
 	fmt.Println("rounds:", blockCount)
 	fmt.Println("threads:", threadCount)
-	nonce, hash := findNonce("hteh", 1)
-	fmt.Printf("%x %x \n", nonce, hash)
 
+	firstBlock := createFirstBlock(diff)
+	blockToString(&firstBlock)
+	seed := firstBlock.hash
+	nonce, hash := findNonce(seed, diff)
+	fmt.Println("printing results of findNonce:")
+	fmt.Printf("%x %x \n", nonce, hash)
+	secondBlock := createBlock(nonce, hash, diff, &firstBlock)
+	blockToString(&secondBlock)
 }
 
 /*
@@ -75,7 +81,7 @@ func askInput() (int, int, int, int, bool) {
 	}
 
 	fmt.Println("Thanks! We will start the simulation with", numOfMiners, "miners on difficulty level", difficulty,
-		"for", numOfRounds, "rounds.")
+		"for", numOfRounds, "rounds using a GOMAXPROCS number of", numOfProcs, ".")
 	fmt.Println("-------------------------------------------------------------------------------")
 	return difficulty, numOfMiners, numOfRounds, numOfProcs, false
 }
