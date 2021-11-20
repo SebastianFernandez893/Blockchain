@@ -1,10 +1,10 @@
 package main
 
 import (
-	"bytes"
 	"crypto/sha256"
 	"strconv"
 	"sync"
+	"bytes"
 )
 
 type Miner struct{
@@ -28,6 +28,7 @@ func run(currMiner *Miner, wg *sync.WaitGroup,){
 	//While there is no block coming in from the logger, findNonce, once nonce found, create and then send block
 	//The determinant for if the block is coming will need to be a channel pulling from the logger, for now I will just make it a boolean
 	noNewBlock:= true
+
 	//Diifuclty and previous hash will need to be pulled from the channel as well.
 	for noNewBlock{
 		nonce,hash := findNonce("abc",1)
@@ -43,8 +44,8 @@ func run(currMiner *Miner, wg *sync.WaitGroup,){
 	
 }
 
-func findNonce(hash string, diff int) (int, [32]byte) {
-
+func findNonce(seed [32]byte, diff int) (int, [32]byte) {
+	hashSeed:= bytes.NewBuffer(seed[:]).String()
 	diffSlice := make([]byte,diff)//Slice which is used to compare the found hash
 	nonceFound := false
 	nonce := -1
@@ -55,7 +56,7 @@ func findNonce(hash string, diff int) (int, [32]byte) {
 	for !nonceFound {
 		nonce++
 		strNonce := strconv.Itoa(nonce)
-		newHash = sha256.Sum256([]byte(strNonce + hash))
+		newHash = sha256.Sum256([]byte(strNonce + hashSeed))
 		x := newHash[:diff]
 		if bytes.Equal(x, diffSlice) {
 			nonceFound = true

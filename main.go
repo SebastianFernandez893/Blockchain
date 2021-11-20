@@ -1,50 +1,89 @@
-
 package main
 
 import (
+
 	"fmt"
+
 )
 
-type Block struct {
-	previousBlock *Block
-	nonce         int
-	//tx            string //Do we need a tx at all? I guess it would then need to be its own struct, so maybe unessecary
-	hash [32]byte
-}
-func createBlock(previousBlock *Block, nonce int,hash [32]byte) Block{
-	block := Block{previousBlock, nonce, hash}
-	return block
-}
 func main() {
-	//var miners, diff,rounds int
-//	diff, miners, rounds := askInput()
-	nonce, hash := findNonce("hteh",1)
+	diff, minerCount, blockCount, threadCount := loopInput()
+	fmt.Println("difficulty:", diff)
+	fmt.Println("miners:", minerCount)
+	fmt.Println("rounds:", blockCount)
+	fmt.Println("threads:", threadCount)
+
+	firstBlock := createFirstBlock(diff)
+	blockToString(&firstBlock)
+	seed := firstBlock.hash
+	nonce, hash := findNonce(seed, diff)
+	fmt.Println("printing results of findNonce:")
 	fmt.Printf("%x %x \n", nonce, hash)
-
+	secondBlock := createBlock(nonce, hash, diff, &firstBlock)
+	blockToString(&secondBlock)
 }
 
-func askInput() (int, int,int){
-	fmt.Println("This program will simulate a blockchain by initializing several miners and a single logger. \n")
-	fmt.Println("The miners will attempt to solve cryptographic puzzles according to a difficulty you set. \n")
-	fmt.Println("The difficulty is determined by comparing the most significant bits of the two hashes. \n")
+/*
+	function loops askInput() until correct input is submitted
+	@output 4 integers corresponding to user input for difficulty level, miner count, block count, and thread count
+*/
+func loopInput() (int, int, int, int) {
+	needInput := true
+	input := []int{0, 0, 0, 0}
+	for needInput {
+		diff, miners, rounds, procsNum, updateNeedInput := askInput()
+		input[0] = diff
+		input[1] = miners
+		input[2] = rounds
+		input[3] = procsNum
+		needInput = updateNeedInput
+	}
+	return input[0], input[1], input[2], input[3]
+}
 
+/*
+	@output 4 integers corresponding to input accepted from user
+			1 boolean representing whether the askInput() needs to be called again
+*/
+func askInput() (int, int, int, int, bool) {
+	fmt.Println("This program will simulate a blockchain by initializing several miners and a single logger.")
+	fmt.Println("The miners will attempt to solve cryptographic puzzles according to a difficulty you set.")
+	fmt.Println("The difficulty is determined by comparing the most significant bits of the two hashes.")
+	fmt.Println("-------------------------------------------------------------------------------")
 
-	fmt.Println("Please choose how many leading bits you would like to be compared. \n")
+	fmt.Println("Please choose how many leading bits you would like to be compared.")
 	var difficulty int
-	fmt.Scanln(&difficulty)
+	_, errD := fmt.Scanln(&difficulty)
+	if errD != nil {
+		fmt.Println("Invalid difficulty level! Try again using an integer.")
+		return 0, 0, 0, 0, true
+	}
 
-	fmt.Println("Please input the number of miners you would like to simulate. \n")
+	fmt.Println("Please input the number of miners you would like to simulate.")
 	var numOfMiners int
-	fmt.Scanln(&numOfMiners)
+	_, errM := fmt.Scanln(&numOfMiners)
+	if errM != nil {
+		fmt.Println("Invalid number of miners! Try again using an integer.")
+		return 0, 0, 0, 0, true
+	}
 
-	fmt.Println("Please input the number of blocks you would like to add to the blockchain \n")
+	fmt.Println("Please input the number of blocks you would like to add to the blockchain.")
 	var numOfRounds int
-	fmt.Scanln(&numOfRounds)
+	_, errR := fmt.Scanln(&numOfRounds)
+	if errR != nil {
+		fmt.Println("Invalid number of miners! Try again using an integer.")
+		return 0, 0, 0, 0, true
+	}
+	fmt.Println("Please input the number of concurrent threads you would like to use.")
+	var numOfProcs int
+	_, errP := fmt.Scanln(&numOfProcs)
+	if errP != nil {
+		fmt.Println("Invalid number of threads! Try again using an integer.")
+		return 0, 0, 0, 0, true
+	}
 
-	return difficulty, numOfMiners,numOfRounds
-
+	fmt.Println("Thanks! We will start the simulation with", numOfMiners, "miners on difficulty level", difficulty,
+		"for", numOfRounds, "rounds using a GOMAXPROCS number of", numOfProcs, ".")
+	fmt.Println("-------------------------------------------------------------------------------")
+	return difficulty, numOfMiners, numOfRounds, numOfProcs, false
 }
-
-
-
-
