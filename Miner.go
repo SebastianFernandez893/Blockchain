@@ -3,45 +3,43 @@ package main
 import (
 	"crypto/sha256"
 	"strconv"
-	"sync"
+
 	"bytes"
 )
 
 type Miner struct{
 	id int
-	pullChan chan bool
+	pullChan *chan Block
 	pushChan chan Block
 }
 
 
 
 func createMiner(id int)Miner{
-	pull:= make(chan bool, 10)
+	pull:= make(chan Block, 10)
 	push:= make(chan Block,10)
-	miner:= Miner{id,pull,push}
+	miner:= Miner{id,&pull,push}
 	return miner
 }
 
-func run(currMiner *Miner, wg *sync.WaitGroup,diff int){
+func run(currMiner *Miner,diff int){
 	//Miner will need to know the difficulty, and the hash of the previousblock
 	//Structure will sort of be
 	//While there is no block coming in from the logger, findNonce, once nonce found, create and then send block
 	//The determinant for if the block is coming will need to be a channel pulling from the logger, for now I will just make it a boolean
-	noNewBlock:= true
-	//Diifuclty and previous hash will need to be pulled from the channel as well.
-	for noNewBlock{
-		nonce,hash := findNonce("abc",1)
-		var temp *Block //temporary block, dont know where to pull previous block pointer from
-		//create Block here
+	var prevBlock Block
+	select{
+		case newBlock, ok := <- *currMiner.pullChan:
+			if ok{
+				prevBlock = newBlock
+			}
+			default:
+				prevBlockHash := prevBlock.hash
+				nonce,hash := findNonce(prevBlockHash,1)
+				block:=createBlock(nonce,hash,diff,&prevBlock)
+				currMiner.pushChan<-block
 
-		block :=createBlock(nonce, hash, diff, temp)
-
-		//Send block here
-		currMiner.pushChan<-block
 	}
-	//So how would the Miner know when there is a new block?
-
-	
 }
 
 func findNonce(seed [32]byte, diff int) (int, [32]byte) {

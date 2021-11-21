@@ -1,9 +1,7 @@
 package main
 
 import (
-
 	"fmt"
-	"sync"
 )
 
 func main() {
@@ -13,10 +11,10 @@ func main() {
 	fmt.Println("rounds:", blockCount)
 	fmt.Println("threads:", threadCount)
 	//Probably create the logger here. As an input it would need the number of miners and the number of blocks
-	wg := &sync.WaitGroup{}
+
 	minerArray:= initMiners(minerCount)
 	for i:=0;i<minerCount;i++{
-		go run(&minerArray[i],wg,diff) //Does this need a waitgroup?
+		go run(&minerArray[i],diff) //Does this need a waitgroup? Probably not, why would the miners need to wait for other miners to finsih?
 	}
 
 	/*
