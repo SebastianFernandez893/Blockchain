@@ -3,7 +3,7 @@ package main
 import (
 
 	"fmt"
-
+	"sync"
 )
 
 func main() {
@@ -12,7 +12,14 @@ func main() {
 	fmt.Println("miners:", minerCount)
 	fmt.Println("rounds:", blockCount)
 	fmt.Println("threads:", threadCount)
+	//Probably create the logger here. As an input it would need the number of miners and the number of blocks
+	wg := &sync.WaitGroup{}
+	minerArray:= initMiners(minerCount)
+	for i:=0;i<minerCount;i++{
+		go run(&minerArray[i],wg,diff) //Does this need a waitgroup?
+	}
 
+	/*
 	firstBlock := createFirstBlock(diff)
 	blockToString(&firstBlock)
 	seed := firstBlock.hash
@@ -21,12 +28,22 @@ func main() {
 	fmt.Printf("%x %x \n", nonce, hash)
 	secondBlock := createBlock(nonce, hash, diff, &firstBlock)
 	blockToString(&secondBlock)
+
+	 */
 }
 
 /*
 	function loops askInput() until correct input is submitted
 	@output 4 integers corresponding to user input for difficulty level, miner count, block count, and thread count
 */
+func initMiners(minerCount int)[]Miner{
+	minerArray:= make([]Miner,minerCount)
+	for i:=0;i<minerCount;i++{
+		miner:= createMiner(i)
+		minerArray = append(minerArray,miner)
+	}
+	return minerArray
+}
 func loopInput() (int, int, int, int) {
 	needInput := true
 	input := []int{0, 0, 0, 0}
