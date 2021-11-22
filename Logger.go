@@ -29,7 +29,7 @@ func loggerVerify(b Block) bool{
 	//end routine and start logger notify
 }
 
-func runLogger(minerArray []Miner,  newmsg pushChanData, oldblock *Block) {
+func runLogger(minerArray []Miner,  newmsg pushChanData, oldblock Block) {
 	// close current channels with miner
 	// select case
 	block := newmsg.block
@@ -39,7 +39,7 @@ func runLogger(minerArray []Miner,  newmsg pushChanData, oldblock *Block) {
 			minerArray[i].pullChan <- block
 		}
 	} else{
-		newmsg.miner.pullChan <- *oldblock
+		newmsg.miner.pullChan <- oldblock
 	}
 }
 
