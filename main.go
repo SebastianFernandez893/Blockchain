@@ -13,7 +13,7 @@ func main() {
 	//Probably create the logger here. As an input it would need the number of blocks
 	//Create the first block
 	//Send it through channel
-	push:= make(chan Block,10)
+	push:= make(chan pushChanData,10)
 	minerArray:= initMiners(minerCount,push)
 	for i:=0;i<minerCount;i++{
 		go run(&minerArray[i],diff,blockCount) //Does this need a waitgroup? Probably not, why would the miners need to wait for other miners to finsih?
@@ -35,7 +35,7 @@ func main() {
 	function loops askInput() until correct input is submitted
 	@output 4 integers corresponding to user input for difficulty level, miner count, block count, and thread count
 */
-func initMiners(minerCount int, push chan Block)[]Miner{
+func initMiners(minerCount int, push chan pushChanData)[]Miner{
 	minerArray:= make([]Miner,minerCount)
 	for i:=0;i<minerCount;i++{
 		miner:= createMiner(i,push)

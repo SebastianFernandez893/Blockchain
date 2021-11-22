@@ -10,13 +10,16 @@ import (
 type Miner struct{
 	id int
 	pullChan chan Block
-	pushChan chan Block
+	pushChan chan pushChanData
 	notifyChan chan bool
+}
+type pushChanData struct{
+	miner Miner
+	block Block
 }
 
 
-
-func createMiner(id int,push chan Block)Miner{
+func createMiner(id int,push chan pushChanData)Miner{
 	pull:= make(chan Block, 10)
 	notifyChan := make(chan bool)
 	miner:= Miner{id,pull,push,notifyChan}
@@ -42,7 +45,8 @@ func run(currMiner *Miner,diff int, blockcount int){
 			}
 			newBlockHeight := prevBlock.height+1
 			block:=createBlock(nonce,hash,diff,&prevBlock,newBlockHeight)
-			currMiner.pushChan<-block
+			data := pushChanData{*currMiner,block}
+			currMiner.pushChan<-data
 		default:
 			//Do Nothing
 		}
