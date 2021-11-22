@@ -8,6 +8,7 @@ import (
 	"strconv"
 )
 
+
 func loggerVerify(b *Block) {
 
 	verify := false

@@ -10,9 +10,11 @@ func main() {
 	fmt.Println("miners:", minerCount)
 	fmt.Println("rounds:", blockCount)
 	fmt.Println("threads:", threadCount)
-	//Probably create the logger here. As an input it would need the number of miners and the number of blocks
-
-	minerArray:= initMiners(minerCount)
+	//Probably create the logger here. As an input it would need the number of blocks
+	//Create the first block
+	//Send it through channel
+	push:= make(chan Block,10)
+	minerArray:= initMiners(minerCount,push)
 	for i:=0;i<minerCount;i++{
 		go run(&minerArray[i],diff,blockCount) //Does this need a waitgroup? Probably not, why would the miners need to wait for other miners to finsih?
 	}
@@ -26,7 +28,6 @@ func main() {
 	fmt.Printf("%x %x \n", nonce, hash)
 	secondBlock := createBlock(nonce, hash, diff, &firstBlock)
 	blockToString(&secondBlock)
-
 	 */
 }
 
@@ -34,10 +35,10 @@ func main() {
 	function loops askInput() until correct input is submitted
 	@output 4 integers corresponding to user input for difficulty level, miner count, block count, and thread count
 */
-func initMiners(minerCount int)[]Miner{
+func initMiners(minerCount int, push chan Block)[]Miner{
 	minerArray:= make([]Miner,minerCount)
 	for i:=0;i<minerCount;i++{
-		miner:= createMiner(i)
+		miner:= createMiner(i,push)
 		minerArray = append(minerArray,miner)
 	}
 	return minerArray

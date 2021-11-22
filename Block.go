@@ -13,7 +13,7 @@ type Block struct {
 	size            int      // not utilized
 	strippedSize    int      // excluding witness data; not utilized
 	weight          int      // as defined in BIP 141; not utilized
-	height          int      // not utilized
+	height          int
 	version         int      // not utilized
 	versionHex      string   // not utilized
 	merkleRoot      string   // not utilized
@@ -68,7 +68,7 @@ func setBlockHash(b *Block) {
 	generates fake data for non-utilized data fields
 	@output new block
 */
-func createBlock(nonce int, hash [32]byte, difficulty int, prevBlock *Block) Block {
+func createBlock(nonce int, hash [32]byte, difficulty int, prevBlock *Block, height int) Block {
 	merkleRootByteArray := sha256.Sum256([]byte("transaction"))
 	merkleRoot := string(merkleRootByteArray[:32])
 	tx0ByteArray := sha256.Sum256([]byte("transaction1"))
