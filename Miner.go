@@ -6,13 +6,15 @@ import (
 	"math/rand"
 	"bytes"
 )
-
+//
 type Miner struct{
 	id int
-	pullChan chan Block
-	pushChan chan pushChanData
-	notifyChan chan bool
+	pullChan chan Block //Channel used to receive block from logger, unique to each Miner
+	pushChan chan pushChanData //Channel used to send block and miner to logger, all Miners use the same channel
+	notifyChan chan bool //Channel used to receive a notification that there is a new block/a block has been verified.
+						 //Primarily used inside the findNonce function
 }
+
 type pushChanData struct{
 	miner *Miner
 	block Block
@@ -26,11 +28,10 @@ func createMiner(id int,push chan pushChanData)Miner{
 	return miner
 }
 
+//Main routine for Miner.
+//@input miner being ran, difficulty of the hash
+//If there is a new block from the logger attempt to find a correct nonce
 func run(currMiner *Miner,diff int, blockcount int){
-	//Miner will need to know the difficulty, and the hash of the previousblock
-	//Structure will sort of be
-	//While there is no block coming in from the logger, findNonce, once nonce found, create and then send block
-	//The determinant for if the block is coming will need to be a channel pulling from the logger, for now I will just make it a boolean
 	var prevBlock Block
 	for true{
 		select{
@@ -38,12 +39,12 @@ func run(currMiner *Miner,diff int, blockcount int){
 			prevBlock = newBlock
 			prevBlockHash := prevBlock.hash
 			nonce,hash := findNonce(prevBlockHash,diff,currMiner)
-			//Creating a bad nonce
+			//10% probability to send a bad block.
 			randNum := rand.Intn(100)
 			if randNum<10{
 				nonce,hash = findBadNonce(prevBlockHash,diff)
 			}
-			newBlockHeight := prevBlock.height+1
+			newBlockHeight := prevBlock.height+1 //Block's number/ID
 			block:=createBlock(nonce,hash,diff,&prevBlock,newBlockHeight)
 			data := pushChanData{currMiner,block}
 			currMiner.pushChan<-data
@@ -52,6 +53,38 @@ func run(currMiner *Miner,diff int, blockcount int){
 		}
 	}
 }
+//Function to find the correct nonce.
+//@input: hash of previous block, difficulty of the puzzle, and current miner
+//@output: nonce that produces a hash with x number of leading zeroes, that hash
+func findNonce(seed [32]byte, diff int, miner *Miner) (int, [32]byte) {
+	hashSeed:= bytes.NewBuffer(seed[:]).String()
+	diffSlice := make([]byte,diff)//Slice which is used to compare "difficulty" leading zeroes of the hashes.
+	nonceFound := false
+	nonce := -1
+
+	//If there is no new block:
+	//This for loop continuely creates new hashes by concatenating a new nonce and the previous blocks hash each iteration.
+	//It then compares it to the difficulty
+	var newHash [32]byte
+	for !nonceFound {
+		select{
+		case here := <-miner.notifyChan:
+			if here==true{
+				break
+			}
+		default:
+			nonce++
+			strNonce := strconv.Itoa(nonce)
+			newHash = sha256.Sum256([]byte(strNonce + hashSeed))
+			x := newHash[:diff] // Taking the x leading zeroes of the foundhash
+			if bytes.Equal(x, diffSlice) {
+				nonceFound = true
+			}
+		}
+	}
+	return nonce, newHash
+}
+//Function to find a bad nonce. Almost the same as findNonce, except it wants to find a nonce that produces a hash without that number of leading zeroes.
 func findBadNonce(seed [32]byte,diff int) (int, [32]byte){
 	hashSeed:= bytes.NewBuffer(seed[:]).String()
 	diffSlice := make([]byte,diff)//Slice which is used to compare the found hash
@@ -62,7 +95,7 @@ func findBadNonce(seed [32]byte,diff int) (int, [32]byte){
 			nonce++
 			strNonce := strconv.Itoa(nonce)
 			newHash = sha256.Sum256([]byte(strNonce + hashSeed))
-			x := newHash[:diff]
+			x := newHash[:diff] // Taking the x leading zeroes of the foundhash
 			if !bytes.Equal(x, diffSlice) {
 				nonceFound = true
 			}
@@ -70,31 +103,3 @@ func findBadNonce(seed [32]byte,diff int) (int, [32]byte){
 	return nonce, newHash
 }
 
-func findNonce(seed [32]byte, diff int, miner *Miner) (int, [32]byte) {
-
-	hashSeed:= bytes.NewBuffer(seed[:]).String()
-	diffSlice := make([]byte,diff)//Slice which is used to compare the found hash
-	nonceFound := false
-	nonce := -1
-
-	//This for loop continuely creates new hashes by concatenating a new nonce and the previous blocks hash each iteration.
-	//It then compares it to the difficulty
-	var newHash [32]byte
-	for !nonceFound {
-		select{
-			case here := <-miner.notifyChan:
-				if here==true{
-					break
-				}
-		default:
-			nonce++
-			strNonce := strconv.Itoa(nonce)
-			newHash = sha256.Sum256([]byte(strNonce + hashSeed))
-			x := newHash[:diff]
-			if bytes.Equal(x, diffSlice) {
-				nonceFound = true
-			}
-		}
-	}
-	return nonce, newHash
-}

@@ -13,7 +13,7 @@ type Block struct {
 	size            int      // not utilized
 	strippedSize    int      // excluding witness data; not utilized
 	weight          int      // as defined in BIP 141; not utilized
-	height          int
+	height          int		 //Id of block
 	version         int      // not utilized
 	versionHex      string   // not utilized
 	merkleRoot      string   // not utilized
