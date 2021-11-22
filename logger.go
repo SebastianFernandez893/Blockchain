@@ -8,19 +8,13 @@ import (
 	"strconv"
 )
 
-type Logger struct {
-	notify chan *bool
-	verify bool
-}
-
-func loggerVerify(Block) {
+func loggerVerify(b *Block) {
 
 	verify := false
 
-	prevBlockHash := Block.hash
-	nonce := Block.nonce
-	diff := Block.difficulty
-	strHash := strcon.Itoa(nonceFound)
+	prevBlockHash := b.hash
+	nonce := b.nonce
+	diff := b.difficulty
 
 	hashSeed := bytes.NewBuffer(prevBlockHash[:]).String()
 	diffSlice := make([]byte, diff)
@@ -29,7 +23,8 @@ func loggerVerify(Block) {
 	x := verifyHash[:diff]
 	// verify nonce
 	if bytes.Equal(x, diffSlice) {
-		verify := true
+		verify = true
+
 	}
 
 	// append block to list of blocks
