@@ -8,10 +8,7 @@ import (
 	"strconv"
 )
 
-
-func loggerVerify(b *Block) {
-
-	verify := false
+func loggerVerify(b Block) bool{
 
 	prevBlockHash := b.hash
 	nonce := b.nonce
@@ -24,17 +21,27 @@ func loggerVerify(b *Block) {
 	x := verifyHash[:diff]
 	// verify nonce
 	if bytes.Equal(x, diffSlice) {
-		verify = true
+		return true
 	}
 
-	_ = verify
+	return false
 	// append block to list of blocks
 	//end routine and start logger notify
 }
 
-func loggerNotify(notify) {
+func runLogger(minerArray []Miner,  newmsg pushChanData, oldblock *Block) {
 	// close current channels with miner
-	close(pull)
-	//initialize channels to send the block to each miner
-
+	// select case
+	block := newmsg.block
+	if (loggerVerify(block) == true){
+		for i := 0; i < len(minerArray); i++{
+			minerArray[i].notifyChan <- true
+			minerArray[i].pullChan <- block
+		}
+	} else{
+		newmsg.miner.pullChan <- *oldblock
+	}
+	
 }
+
+
