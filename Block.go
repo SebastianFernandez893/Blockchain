@@ -1,10 +1,10 @@
 package main
 
 import (
-"crypto/sha256"
-"fmt"
-"strconv"
-"time"
+	"crypto/sha256"
+	"fmt"
+	"strconv"
+	"time"
 )
 
 type Block struct {
@@ -13,7 +13,7 @@ type Block struct {
 	size            int      // not utilized
 	strippedSize    int      // excluding witness data; not utilized
 	weight          int      // as defined in BIP 141; not utilized
-	height          int		 //Id of block
+	height          int      //Id of block
 	version         int      // not utilized
 	versionHex      string   // not utilized
 	merkleRoot      string   // not utilized
@@ -79,7 +79,7 @@ func createBlock(nonce int, hash [32]byte, difficulty int, prevBlock *Block, hei
 	chainWork := "000000000000000000000000000000000000000000000000000001f501f501f5"
 	prevBlockHash := prevBlock.hash
 	block := Block{hash, 1, 1, 1, 1,
-		1, 1, "00000001", merkleRoot, tx,
+		height, 1, "00000001", merkleRoot, tx,
 		timestamp, medianTimestamp, nonce,
 		"1d00ffff", difficulty, chainWork, prevBlockHash, prevBlock}
 	return block
