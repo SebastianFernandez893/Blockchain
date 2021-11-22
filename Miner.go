@@ -14,7 +14,7 @@ type Miner struct{
 	notifyChan chan bool
 }
 type pushChanData struct{
-	miner Miner
+	miner *Miner
 	block Block
 }
 
@@ -45,7 +45,7 @@ func run(currMiner *Miner,diff int, blockcount int){
 			}
 			newBlockHeight := prevBlock.height+1
 			block:=createBlock(nonce,hash,diff,&prevBlock,newBlockHeight)
-			data := pushChanData{*currMiner,block}
+			data := pushChanData{currMiner,block}
 			currMiner.pushChan<-data
 		default:
 			//Do Nothing
