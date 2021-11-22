@@ -41,7 +41,7 @@ func runLogger(minerArray []Miner,  newmsg pushChanData, oldblock *Block) {
 	} else{
 		newmsg.miner.pullChan <- *oldblock
 	}
-	
+
 }
 
 

@@ -33,17 +33,22 @@ func createMiner(id int,push chan pushChanData)Miner{
 //If there is a new block from the logger attempt to find a correct nonce
 func run(currMiner *Miner,diff int, blockcount int){
 	var prevBlock Block
+	var nonce int
+	var hash [32]byte
 	for true{
 		select{
 		case newBlock := <- currMiner.pullChan:
 			prevBlock = newBlock
 			prevBlockHash := prevBlock.hash
-			nonce,hash := findNonce(prevBlockHash,diff,currMiner)
-			//10% probability to send a bad block.
 			randNum := rand.Intn(100)
 			if randNum<10{
 				nonce,hash = findBadNonce(prevBlockHash,diff)
-			}
+			} else{
+				nonce,hash = findNonce(prevBlockHash,diff,currMiner)
+		}
+
+			//10% probability to send a bad block.
+
 			newBlockHeight := prevBlock.height+1 //Block's number/ID
 			block:=createBlock(nonce,hash,diff,&prevBlock,newBlockHeight)
 			data := pushChanData{currMiner,block}
