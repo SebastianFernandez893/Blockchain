@@ -5,6 +5,7 @@ package main
 import (
 	"bytes"
 	"crypto/sha256"
+	"strconv"
 )
 
 type Logger struct {
@@ -13,20 +14,24 @@ type Logger struct {
 }
 
 func loggerVerify(Block) {
-	// receive nonce + block from miner
 
-	// verify nonce value given by hashing nonce received
-	prevHash = block.previousBlock
-	nonceFound = block.nonce
-	diff = block.difficulty
-	diffSlice := []byte{diff}
+	verify := false
+
+	prevBlockHash := Block.hash
+	nonce := Block.nonce
+	diff := Block.difficulty
 	strHash := strcon.Itoa(nonceFound)
-	verifyHash := sha256.Sum256([]byte(nonceFound + prevHash))
-	//verify difficulty condition is met
-	x := verifyHash[:diff+1]
+
+	hashSeed := bytes.NewBuffer(prevBlockHash[:]).String()
+	diffSlice := make([]byte, diff)
+	strNonce := strconv.Itoa(nonce)
+	verifyHash := sha256.Sum256([]byte(strNonce + hashSeed))
+	x := verifyHash[:diff]
+	// verify nonce
 	if bytes.Equal(x, diffSlice) {
-		verify = True
+		verify := true
 	}
+
 	// append block to list of blocks
 	//end routine and start logger notify
 }
