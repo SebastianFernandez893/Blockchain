@@ -14,7 +14,7 @@ func main() {
 
 	minerArray:= initMiners(minerCount)
 	for i:=0;i<minerCount;i++{
-		go run(&minerArray[i],diff) //Does this need a waitgroup? Probably not, why would the miners need to wait for other miners to finsih?
+		go run(&minerArray[i],diff,blockCount) //Does this need a waitgroup? Probably not, why would the miners need to wait for other miners to finsih?
 	}
 
 	/*

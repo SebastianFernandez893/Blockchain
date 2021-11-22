@@ -22,23 +22,25 @@ func createMiner(id int)Miner{
 	return miner
 }
 
-func run(currMiner *Miner,diff int){
+func run(currMiner *Miner,diff int,blockcount int){
 	//Miner will need to know the difficulty, and the hash of the previousblock
 	//Structure will sort of be
 	//While there is no block coming in from the logger, findNonce, once nonce found, create and then send block
 	//The determinant for if the block is coming will need to be a channel pulling from the logger, for now I will just make it a boolean
 	var prevBlock Block
-	select{
+	for i := 0;i<blockcount;i++{
+		select{
 		case newBlock, ok := <- *currMiner.pullChan:
 			if ok{
 				prevBlock = newBlock
 			}
-			default:
-				prevBlockHash := prevBlock.hash
-				nonce,hash := findNonce(prevBlockHash,1)
-				block:=createBlock(nonce,hash,diff,&prevBlock)
-				currMiner.pushChan<-block
+		default:
+			prevBlockHash := prevBlock.hash
+			nonce,hash := findNonce(prevBlockHash,1)
+			block:=createBlock(nonce,hash,diff,&prevBlock)
+			currMiner.pushChan<-block
 
+		}
 	}
 }
 
