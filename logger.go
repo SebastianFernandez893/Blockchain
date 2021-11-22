@@ -30,21 +30,17 @@ func loggerVerify(b *Block) {
 }
 
 func runLogger(minerArray, pushChanData newmsg, oldblock *Block) {
-// close current channels with miner
-// select case
-block = newmsg.Block 
+	// close current channels with miner
+	// select case
+	block := newmsg.Block
 
-if (loggerVerify(block) == true){
-	for i := 0; i < minerArray.length(); i++{
-		minerArray[i].notifyChan <- true 
-		minerArray[i].pullChan <- block
+	if loggerVerify(block) == true {
+		for i := 0; i < minerArray.length(); i++ {
+			minerArray[i].notifyChan <- true
+			minerArray[i].pullChan <- block
+		}
+
+	} else {
+		newmsg.miner.pullChan <- oldblock
 	}
 }
-else{
-	newmsg.miner.pullChan <- oldblock
-}
-break 
-}
-
-
-
