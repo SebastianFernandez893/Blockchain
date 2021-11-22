@@ -39,7 +39,6 @@ func run(currMiner *Miner,diff int,blockcount int){
 			nonce,hash := findNonce(prevBlockHash,1)
 			block:=createBlock(nonce,hash,diff,&prevBlock)
 			currMiner.pushChan<-block
-
 		}
 	}
 }
