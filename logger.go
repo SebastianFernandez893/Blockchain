@@ -10,8 +10,6 @@ import (
 
 func loggerVerify(b *Block) {
 
-	verify := false
-
 	prevBlockHash := b.hash
 	nonce := b.nonce
 	diff := b.difficulty
@@ -23,17 +21,20 @@ func loggerVerify(b *Block) {
 	x := verifyHash[:diff]
 	// verify nonce
 	if bytes.Equal(x, diffSlice) {
-		verify = true
+		return true
 	}
 
-	_ = verify
+	return false
 	// append block to list of blocks
 	//end routine and start logger notify
 }
 
-func loggerNotify(notify) {
-	// close current channels with miner
-	close(pull)
-	//initialize channels to send the block to each miner
+func runLogger(minerArray, pushChan) {
+// close current channels with miner
+// select case
 
-}
+loggerVerify()
+
+//initialize channels to send the block to each miner
+Notify chan <- true 
+ }
