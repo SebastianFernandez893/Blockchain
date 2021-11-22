@@ -24,15 +24,16 @@ func loggerVerify(b *Block) {
 	// verify nonce
 	if bytes.Equal(x, diffSlice) {
 		verify = true
-
 	}
 
+	_ = verify
 	// append block to list of blocks
 	//end routine and start logger notify
 }
 
 func loggerNotify(notify) {
 	// close current channels with miner
+	close(pull)
 	//initialize channels to send the block to each miner
 
 }
