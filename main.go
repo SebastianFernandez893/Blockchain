@@ -12,6 +12,7 @@ func main() {
 	fmt.Println("threads:", threadCount)
 	//Probably create the logger here. As an input it would need the number of miners and the number of blocks
 
+	push := make(chan pushChanData, 10)
 	minerArray := initMiners(minerCount)
 	for i := 0; i < minerCount; i++ {
 		go run(&minerArray[i], diff) //Does this need a waitgroup? Probably not, why would the miners need to wait for other miners to finsih?
