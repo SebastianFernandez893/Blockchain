@@ -15,7 +15,7 @@ func runLogger(wg *sync.WaitGroup, minerArray []Miner, toLoggerChan chan toLogge
 	fmt.Println("Started Logger")
 	i := 1
 	oldBlock := createFirstBlock(diff)
-
+	blockToString(&oldBlock)
 	// send first block to all miners
 	for i := 0; i < len(minerArray); i++ {
 		minerArray[i].toMinerChan <- oldBlock
@@ -29,13 +29,14 @@ func runLogger(wg *sync.WaitGroup, minerArray []Miner, toLoggerChan chan toLogge
 			i++
 			fmt.Println("incremented chain height")
 		}
+		fmt.Println("i value is", i)
 		oldBlock = currBlock
 	}
 	fmt.Println("Ending Logger")
 }
 
-func loggerVerify(b Block) bool {
-	prevBlockHash := b.hash
+func loggerVerify(b *Block) bool {
+	prevBlockHash := b.prevBlockHash
 	nonce := b.nonce
 	diff := b.difficulty
 
@@ -48,7 +49,6 @@ func loggerVerify(b Block) bool {
 	if bytes.Equal(x, diffSlice) {
 		return true
 	}
-
 	return false
 	// append block to list of blocks
 	//end routine and start logger notify
@@ -58,10 +58,10 @@ func notifyMiner(minerArray []Miner, newmsg toLoggerData, oldBlock Block) (bool,
 	// close current channels with miner
 	// select case
 	block := newmsg.block
-	if loggerVerify(block) == true {
+	if loggerVerify(&block) == true {
 		fmt.Println("Block was verified!! from", newmsg.miner.id)
 		for i := 0; i < len(minerArray); i++ {
-			minerArray[i].notifyChan <- true
+			//minerArray[i].notifyChan <- true
 			minerArray[i].toMinerChan <- block
 			fmt.Println("Block was sent to miner", minerArray[i].id)
 		}

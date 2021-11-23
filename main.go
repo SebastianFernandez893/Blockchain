@@ -18,7 +18,9 @@ func main() {
 	//Probably create the logger here. As an input it would need the number of blocks
 	//Create the first block
 	//Send it through channel
+	fmt.Println("iterating through MinerArray")
 	for i := 0; i < minerCount; i++ {
+		fmt.Println("index", i, "is", minerArray[i].id)
 		go run(&minerArray[i], diff) //Does this need a waitgroup? Probably not, why would the miners need to wait for other miners to finsih?
 	}
 	go runLogger(&wg, minerArray, toLoggerChan, blockCount, diff)
@@ -42,8 +44,8 @@ func main() {
 func initMiners(minerCount int, toLoggerChan chan toLoggerData) []Miner {
 	minerArray := make([]Miner, minerCount)
 	for i := 0; i < minerCount; i++ {
-		miner := createMiner(i, toLoggerChan)
-		minerArray = append(minerArray, miner)
+		fmt.Println(i)
+		minerArray[i] = createMiner(i, toLoggerChan)
 	}
 	return minerArray
 }
