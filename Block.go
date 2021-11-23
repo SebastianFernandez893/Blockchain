@@ -30,7 +30,8 @@ type Block struct {
 
 func blockToString(b *Block) {
 	fmt.Println("Printing Block information:")
-	fmt.Println("\thash:", b.hash)
+	fmt.Printf("\thash: %x", b.hash)
+	fmt.Println()
 	fmt.Println("\tconfirmations:", b.confirmations)
 	fmt.Println("\tsize:", b.size)
 	fmt.Println("\tstripped size:", b.strippedSize)
@@ -45,7 +46,8 @@ func blockToString(b *Block) {
 	fmt.Println("\tbits:", b.bits)
 	fmt.Println("\tdifficulty:", b.difficulty)
 	fmt.Println("\tchain work:", b.chainWork)
-	fmt.Println("\tprevBlockHash:", b.prevBlockHash)
+	fmt.Printf("\tprevBlockHash: %x", b.prevBlockHash)
+	fmt.Println()
 }
 
 /*
@@ -59,7 +61,7 @@ func setBlockHash(b *Block) {
 		b.tx[0] + strconv.FormatInt(b.timestamp, 10) + strconv.FormatInt(b.medianTimestamp, 10) + strconv.Itoa(b.nonce) +
 		b.bits + strconv.Itoa(b.difficulty) + b.chainWork + string(b.prevBlockHash[:32])
 	hashOut := sha256.Sum256([]byte(hashIn))
-	//output := string(hashOut[:32]) // there might be an issue with the length of the array
+
 	b.hash = hashOut
 }
 

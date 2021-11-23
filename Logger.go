@@ -10,31 +10,36 @@ import (
 	"sync"
 )
 
+/* check to see if there is a proposed block from a miner
+hen a valid block is found, notify miners.
+
+*/
 func runLogger(wg *sync.WaitGroup, minerArray []Miner, toLoggerChan chan toLoggerData, chainLength int, diff int) {
 	defer wg.Done()
 	fmt.Println("Started Logger")
 	i := 1
 	oldBlock := createFirstBlock(diff)
-	//blockToString(&oldBlock)
+	blockToString(&oldBlock)
 	// send first block to all miners
 	for i := 0; i < len(minerArray); i++ {
 		minerArray[i].toMinerChan <- oldBlock
 	}
-	fmt.Println("sent initial block to miners")
+
 	for i <= chainLength {
 		newmsg := <-toLoggerChan
-		fmt.Println("received block proposal from miner", newmsg.miner.id)
+
 		isValid, currBlock := notifyMiner(minerArray, newmsg, oldBlock)
 		if isValid {
 			i++
 			fmt.Println("incremented chain height")
-			//fmt.Println("next block is : ", &currBlock)
+			
 		}
 		oldBlock = currBlock
 	}
 	fmt.Println("Ending Logger")
 }
 
+// verify the hash from a given block solves the puzzle
 func loggerVerify(b *Block) bool {
 	prevBlockHash := b.prevBlockHash
 	nonce := b.nonce
@@ -47,6 +52,7 @@ func loggerVerify(b *Block) bool {
 	x := verifyHash[:diff]
 	// verify nonce
 	if bytes.Equal(x, diffSlice) {
+
 		return true
 	}
 	return false
@@ -54,6 +60,7 @@ func loggerVerify(b *Block) bool {
 	//end routine and start logger notify
 }
 
+// Notify miners of new block and that puzzle was solved correctly
 func notifyMiner(minerArray []Miner, newmsg toLoggerData, oldBlock Block) (bool, Block) {
 	// close current channels with miner
 	// select case
@@ -62,11 +69,8 @@ func notifyMiner(minerArray []Miner, newmsg toLoggerData, oldBlock Block) (bool,
 		fmt.Println("Block was verified!! from", newmsg.miner.id)
 		for i := 0; i < len(minerArray); i++ {
 			currMiner := &minerArray[i]
-			if currMiner.id != newmsg.miner.id {
-				//currMiner.notifyChan <- true
-				currMiner.toMinerChan <- block
-				fmt.Println("Block was sent to miner", minerArray[i].id)
-			}
+			currMiner.notifyChan <- true
+			currMiner.toMinerChan <- block
 
 		}
 		return true, block // if block was valid and added to chain

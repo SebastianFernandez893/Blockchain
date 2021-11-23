@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"runtime"
 	"sync"
+	"time"
 )
 
 var wg sync.WaitGroup
@@ -15,26 +16,20 @@ func main() {
 	runtime.GOMAXPROCS(threadCount)
 	toLoggerChan := make(chan toLoggerData, minerCount)
 	minerArray := initMiners(minerCount, toLoggerChan, blockCount)
-	//Probably create the logger here. As an input it would need the number of blocks
-	//Create the first block
+
 	//Send it through channel
-	fmt.Println("iterating through MinerArray")
+	time1 := time.Now()
 	for i := 0; i < minerCount; i++ {
-		fmt.Println("index", i, "is", minerArray[i].id)
+
 		go run(&minerArray[i], diff) //Does this need a waitgroup? Probably not, why would the miners need to wait for other miners to finsih?
 	}
 	go runLogger(&wg, minerArray, toLoggerChan, blockCount, diff)
 	wg.Wait()
-	/*
-		firstBlock := createFirstBlock(diff)
-		blockToString(&firstBlock)
-		seed := firstBlock.hash
-		nonce, hash := findNonce(seed, diff)
-		fmt.Println("printing results of findNonce:")
-		fmt.Printf("%x %x \n", nonce, hash)
-		secondBlock := createBlock(nonce, hash, diff, &firstBlock)
-		blockToString(&secondBlock)
-	*/
+
+	time2 := time.Now()
+	timeDiff := time2.Sub(time1)
+	fmt.Println("the total puzzle time is : ", &timeDiff)
+
 }
 
 /*
@@ -44,7 +39,6 @@ func main() {
 func initMiners(minerCount int, toLoggerChan chan toLoggerData, blockCount int) []Miner {
 	minerArray := make([]Miner, minerCount)
 	for i := 0; i < minerCount; i++ {
-		fmt.Println(i)
 		minerArray[i] = createMiner(i, toLoggerChan, blockCount)
 	}
 	return minerArray
