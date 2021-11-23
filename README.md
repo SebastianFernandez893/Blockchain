@@ -27,7 +27,8 @@ The program will request integer inputs for the difficulty level, number of mine
 -- will add a screenshot of input screen--
 ### 4. Example of expected output
 
--- will add screenshots and descriptions of sample outputs--
+<img width="800" alt="Screen Shot 2021-11-22 at 10 33 01 PM 1" src="https://user-images.githubusercontent.com/90422615/142967762-8fa7aeed-7f44-4a45-b911-7d2cd9c808da.png">
+
 
 Workflow Diagram
 ----
