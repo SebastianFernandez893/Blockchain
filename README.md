@@ -6,4 +6,8 @@ The user will input the number of miners, blocks, and processes being ran. As we
 ##How to Run:
 ####Step 1: Clone Git Repository
 Clone the repository with `git clone https://github.com/SebastianFernandez1999/Blockchain`
-####Step 2: 
+####Step 2: Run using go run *.go
+
+####Step 4: Input number of miners, blocks, processes, and difficulty.
+
+
