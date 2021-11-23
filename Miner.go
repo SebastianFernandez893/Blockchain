@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"crypto/sha256"
-	"fmt"
 	"math/rand"
 	"strconv"
 )
@@ -22,8 +21,8 @@ type toLoggerData struct {
 	block Block
 }
 
-func createMiner(id int, toLoggerChan chan toLoggerData) Miner {
-	pull := make(chan Block, 10)
+func createMiner(id int, toLoggerChan chan toLoggerData, blockCount int) Miner {
+	pull := make(chan Block, blockCount)
 	notifyChan := make(chan bool)
 	miner := Miner{id, pull, toLoggerChan, notifyChan}
 	return miner
@@ -33,22 +32,22 @@ func createMiner(id int, toLoggerChan chan toLoggerData) Miner {
 //@input miner being ran, difficulty of the hash
 //If there is a new block from the logger attempt to find a correct nonce
 func run(currMiner *Miner, diff int) {
-	fmt.Println("starting miner", currMiner.id)
 	var prevBlock Block
 	var nonce int
 	var hash [32]byte
 	for true {
+
 		select {
 		case newBlock := <-currMiner.toMinerChan:
-			fmt.Println("Miner", currMiner.id, "received new block")
+			//fmt.Println("Miner", currMiner.id, "received new block")
 			prevBlock = newBlock
 			prevBlockHash := prevBlock.hash
 			randNum := rand.Intn(100)
-			if randNum < 1 {
-				fmt.Println("Miner", currMiner.id, "finding invalid nonce")
-				nonce, hash = findBadNonce(prevBlockHash, diff, currMiner)
+			if randNum < 10 {
+				//fmt.Println("Miner", currMiner.id, "finding invalid nonce")
+				nonce, hash = findBadNonce(prevBlockHash, diff)
 			} else {
-				fmt.Println("Miner", currMiner.id, "working to find good nonce")
+				//fmt.Println("Miner", currMiner.id, "working to find good nonce")
 				nonce, hash = findNonce(prevBlockHash, diff, currMiner)
 			}
 
@@ -60,8 +59,8 @@ func run(currMiner *Miner, diff int) {
 			data := toLoggerData{currMiner, block}
 			currMiner.toLoggerChan <- data
 		default:
-			//fmt.Println("Miner", currMiner.id, "default")
 			//Do Nothing
+
 		}
 	}
 }
@@ -83,47 +82,37 @@ func findNonce(seed [32]byte, diff int, miner *Miner) (int, [32]byte) {
 		select {
 		case here := <-miner.notifyChan:
 			if here == true {
-				fmt.Println("Miner", miner.id, "notified to stop solving")
 				break
 			}
 		default:
 			nonce++
 			strNonce := strconv.Itoa(nonce)
 			newHash = sha256.Sum256([]byte(strNonce + hashSeed))
+
 			x := newHash[:diff] // Taking the x leading zeroes of the foundhash
 			if bytes.Equal(x, diffSlice) {
 				nonceFound = true
 			}
 		}
 	}
-	fmt.Println("Miner", miner.id, "found nonce!")
 	return nonce, newHash
 }
 
 //Function to find a bad nonce. Almost the same as findNonce, except it wants to find a nonce that produces a hash without that number of leading zeroes.
-func findBadNonce(seed [32]byte, diff int, miner *Miner) (int, [32]byte) {
+func findBadNonce(seed [32]byte, diff int) (int, [32]byte) {
 	hashSeed := bytes.NewBuffer(seed[:]).String()
 	diffSlice := make([]byte, diff) //Slice which is used to compare the found hash
 	nonceFound := false
 	nonce := -1
 	var newHash [32]byte
 	for !nonceFound {
-		select {
-		case here := <-miner.notifyChan:
-			if here == true {
-				fmt.Println("Miner", miner.id, "notified to stop solving")
-				break
-			}
-		default:
-			nonce++
-			strNonce := strconv.Itoa(nonce)
-			newHash = sha256.Sum256([]byte(strNonce + hashSeed))
-			x := newHash[:diff] // Taking the x leading zeroes of the foundhash
-			if !bytes.Equal(x, diffSlice) {
-				nonceFound = true
-			}
+		nonce++
+		strNonce := strconv.Itoa(nonce)
+		newHash = sha256.Sum256([]byte(strNonce + hashSeed))
+		x := newHash[:diff] // Taking the x leading zeroes of the foundhash
+		if !bytes.Equal(x, diffSlice) {
+			nonceFound = true
 		}
 	}
-	fmt.Println("found bad nonce")
 	return nonce, newHash
 }

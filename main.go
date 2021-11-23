@@ -14,7 +14,7 @@ func main() {
 
 	runtime.GOMAXPROCS(threadCount)
 	toLoggerChan := make(chan toLoggerData, minerCount)
-	minerArray := initMiners(minerCount, toLoggerChan)
+	minerArray := initMiners(minerCount, toLoggerChan, blockCount)
 	//Probably create the logger here. As an input it would need the number of blocks
 	//Create the first block
 	//Send it through channel
@@ -41,11 +41,11 @@ func main() {
 	function loops askInput() until correct input is submitted
 	@output 4 integers corresponding to user input for difficulty level, miner count, block count, and thread count
 */
-func initMiners(minerCount int, toLoggerChan chan toLoggerData) []Miner {
+func initMiners(minerCount int, toLoggerChan chan toLoggerData, blockCount int) []Miner {
 	minerArray := make([]Miner, minerCount)
 	for i := 0; i < minerCount; i++ {
 		fmt.Println(i)
-		minerArray[i] = createMiner(i, toLoggerChan)
+		minerArray[i] = createMiner(i, toLoggerChan, blockCount)
 	}
 	return minerArray
 }
